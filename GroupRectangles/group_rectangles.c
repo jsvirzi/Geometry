@@ -1,13 +1,15 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef struct rectangle {
 	float x1, y1, x2, y2;
 } Rectangle; 
 
 typedef struct extended_rectangle {
-	Rectangle *rectangle;
+	Rectangle *rect;
+	struct extended_rectangle *prev, *next; /* for linked list */
 	float area;
 	float intersection_threshold;
 	int id;
@@ -24,7 +26,7 @@ typedef struct point {
 float is_interior(Point *p, Rectangle *rect);
 
 float area(Rectangle *rect) {
-	return (rect->ymax - rect->ymin) * (rect->xmax - rect->xmin);
+	return (rect->y2 - rect->y1) * (rect->x2 - rect->x1);
 }
 
 float area(Point *p, int n) {
@@ -128,6 +130,7 @@ printf("hello b y1a=%.1f y1b=%.1f y2b=%.1f y2a=%.1f\n", y1a, y1b, y2b, y2a);
 
 /* assume ordered in x, y? */
 float intersection(Rectangle *recta, Rectangle *rectb) {
+	float result = 0.0;
 	float xmin = recta->x1;
 	float xmax = xmin;
 	if(recta->x2 < xmin) xmin = recta->x2;
@@ -207,7 +210,8 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 			if(y > ymax) ymax = y;
 		}
 
-		double area0 = (ymax - ymin) * (xmax - xmin);
+		result = (ymax - ymin) * (xmax - xmin);
+#if 0
 		printf("basic area = %f\n", area0);
 
 		p = pts[1];
@@ -221,6 +225,7 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 		pts[3] = p;
 
 		printf("final area = %f\n", area(pts, n));
+#endif
 	}
 
 #if 0
@@ -231,6 +236,8 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 	p = { recta->x2, recta->y1 };
 	p = { recta->x2, recta->y2 };
 #endif
+
+	return result;
 }
 
 /* y2 = y1, y4 = y3, x3 = x2, x4 = x1 */
@@ -274,60 +281,124 @@ float is_interior(Point *p, Rectangle *rect) {
 	return atan2(s1, c1) + atan2(s2, c2) + atan2(s3, c3) + atan2(s4, c4);
 }
 
-Rectangle *group_rectangles(Rectangle *rects, int n, double beta) {
+Rectangle *group_rectangles(Rectangle *rects, int n, double beta, int *size) {
 	int i, j;
 //	float *area = new float [ n ];
 //	memset(area, 0, n * sizeof(float));
-	float *overlap = new float [ n * n ];
-	memset(overlap, 0, n * n * sizeof(float));
-	int *alpha = new int [ n ];
+//	float *overlap = new float [ n * n ];
+//	memset(overlap, 0, n * n * sizeof(float));
+//	int *alpha = new int [ n ];
 	ExtendedRectangle *extended_rectangles = new ExtendedRectangle [ n ]; /* allocate maximum */
+	Rectangle *result = new Rectangle [ n ]; /* allocate maximum */
 	for(i=0;i<n;++i) {
 		Rectangle *rect = &rects[i];
 		extended_rectangles[i].rect = rect;
 		float a = area(rect);
 		extended_rectangles[i].area = a;
 		extended_rectangles[i].intersection_threshold = a * beta; 
-		extended_rectangles[i].id = -1;
+		extended_rectangles[i].id = -1; /* not yet considered */
+		extended_rectangles[i].prev = extended_rectangles[i].next = &extended_rectangles[i]; /* points to self */
 	}
 
-	int current_id = 0;
 	for(i=1;i<n;++i) {
-		bool flag = false;
-		float a1 = area[i];
-		float t1 = extended_rectangles[i].intersection_threshold; /* first threshold for intersection */
-		int candidate_id = extended_rectangles[i].id;
+		// bool flag = false;
+		ExtendedRectangle *recti = &extended_rectangles[i];
+		float a1 = recti->area;
+		float t1 = recti->intersection_threshold; /* first threshold for intersection */
+		// int candidate_id = recti->id;
 		for(j=i+1;j<n;++j) {
-			float t2 = extended_rectangles[i].intersection_threshold; /* 2nd threshold for intersection */
-			float a = intersection(&rects[i], &rects[j]);
-			overlap[i * n + j] = a; /* jsv need? */
+			ExtendedRectangle *rectj = &extended_rectangles[j];
+			float t2 = rectj->intersection_threshold; /* 2nd threshold for intersection */
+			float a = intersection(recti->rect, rectj->rect);
+			// overlap[i * n + j] = a; /* jsv need? */
 			if((a > t1) || (a > t2)) {
-				if(candidate_id >= 0) {
-					extended_rectangles[j].id = candidate_id;
-				}
-				flag = true;
+				ExtendedRectangle *rect;
+
+				rect = rectj->next;
+				rectj->next = recti;
+				recti->prev->next = rect;
+
+				rect = rectj->prev;
+				rectj->prev = recti;
+				recti->next->prev = rect;
+
+				// if(extended_rectangles[i].id < 0
+				// if(candidate_id >= 0) {
+					// extended_rectangles[j].id = candidate_id;
+				// }
+				// flag = true;
 			}
 		}
-		if(flag == false) { /* no intersection with any other rectangle. give id and move on */
-			extended_rectangles[i].id = current_id++;
-		} else {
-		}
+		// // // // if(flag == false) { /* no intersection with any other rectangle. give id and move on */
+			// extended_rectangles[i].id = current_id++;
+		// } else {
+		// }
 	}
-	delete [] area;
-	delete [] alpha;
-	delete [] overlap;
+
+	int index = 0;
+	for(i=1;i<n;++i) {
+		ExtendedRectangle *rect0 = &extended_rectangles[i], *rect = rect0;
+		if(rect->id == 0) continue; /* already been processed */
+		rect->id = 0;
+		float a = rect->area, atot = a;
+		float xmin = a * rect->rect->x1;
+		float xmax = a * rect->rect->x2;
+		float ymin = a * rect->rect->y1;
+		float ymax = a * rect->rect->y2;
+		while(rect->next != rect0) {
+			rect = rect->next;
+			rect->id = 0;
+			a = rect->area;
+			xmin += a * rect->rect->x1;
+			xmax += a * rect->rect->x2;
+			ymin += a * rect->rect->y1;
+			ymax += a * rect->rect->y2;
+			atot += a;
+		}
+		xmin /= atot;
+		xmax /= atot;
+		ymin /= atot;
+		ymax /= atot;
+		result[index++] = { xmin, ymin, xmax, ymax };
+	}
+
+	*size = index;
+	
+	delete [] extended_rectangles;
+
+	// delete [] area;
+	// delete [] alpha;
+	// delete [] overlap;
 
 	return result;
+}
+
+#define NRECTS 4
+Rectangle rectangles[NRECTS] = {
+	{ 0.0, 0.0, 2.0, 2.0 },
+	{ 1.0, 1.0, 3.0, 3.0 },
+	{ 4.0, 4.0, 5.0, 5.0 },
+	{ 2.0, 0.0, 4.0, 2.0 },
+};
+
+void print_rectangle(Rectangle *rect) {
+	printf("rectangle = (%.1f, %.1f) x (%.1f, %.1f)\n", rect->x1, rect->y1, rect->x2, rect->y2);
 }
 
 int main(int argc, char **argv) {
 	Rectangle recta = { 0.0, 0.0, 2.0, 2.0 };
 	Rectangle rectb = { 1.0, 1.0, 3.0, 3.0 };
-	float x = atof(argv[1]);
-	float y = atof(argv[2]);
-	Point p = { x, y };
-	float a = is_interior(&p, &recta);
-	printf("A = %f\n", a);
-	intersection(&recta, &rectb);
+	// float x = atof(argv[1]);
+	// float y = atof(argv[2]);
+	// Point p = { x, y };
+	// float a = is_interior(&p, &recta);
+	// printf("A = %f\n", a);
+	// intersection(&recta, &rectb);
+	int i, size, nrects = NRECTS;
+	Rectangle *new_rectangles = group_rectangles(rectangles, nrects, 0.1, &size);
+	printf("%d old rectangles\n", nrects);
+	for(i=0;i<nrects;++i) print_rectangle(&rectangles[i]);
+	printf("%d new rectangles\n", size);
+	for(i=0;i<size;++i) print_rectangle(&new_rectangles[i]);
 	return 0;
 }
