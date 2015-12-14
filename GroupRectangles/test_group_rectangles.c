@@ -7,18 +7,32 @@
 using namespace cv;
 using namespace std;
 
-#define NRECTS 4
-Rectangle rectangles[NRECTS] = {
-	{ 0.0, 0.0, 2.0, 2.0 },
-	{ 1.0, 1.0, 3.0, 3.0 },
-	{ 4.0, 4.0, 5.0, 5.0 },
-	{ 2.0, 0.0, 4.0, 2.0 },
+Rectangle rectangles[] = {
+	// {  0.0,  0.0,  2.0,  2.0 },
+	// {  1.0,  1.0,  3.0,  3.0 },
+	// {  4.0,  4.0,  5.0,  5.0 },
+	// {  2.0,  0.0,  4.0,  2.0 },
+	// {  2.0,  4.0,  8.0,  6.0 },
+	// {  4.0,  4.0,  6.0,  5.0 },
+
+	{  1.0,  9.0,  7.0, 11.0 },
+	{  3.0,  9.0,  5.0, 11.0 },
+	// // {  5.0,  9.0,  5.0, 11.0 },
+	// // {  7.0,  9.0,  7.0, 11.0 },
+
+	// {  9.0,  9.0, 15.0, 15.0 }, 
+	// { 11.0,  8.0, 13.0, 13.0 },
+
+	{ -1.0,  0.0,  0.0,  0.0 }
 };
 
-float scale = 5.0;
+float scale = 0.0;
 
 int main(int argc, char **argv) {
-	int i, size, nrects = NRECTS;
+	int i, size, nrects = 0;
+	for(nrects=0;rectangles[nrects].x1>=0;) ++nrects; /* count the rectangles */
+	for(i=0;i<nrects;++i) if(rectangles[i].y2 > scale) scale = rectangles[i].y2;
+	printf("found %d rectangles as input. scale = %.1f\n", nrects, scale);
 	Rectangle *new_rectangles = group_rectangles(rectangles, nrects, 0.1, &size);
 	printf("%d old rectangles\n", nrects);
 	for(i=0;i<nrects;++i) printf("%s\n", print_rectangle(&rectangles[i]));
