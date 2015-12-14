@@ -14,9 +14,7 @@
  * B***A***A***B 
  */
 
-typedef struct rectangle {
-	float x1, y1, x2, y2;
-} Rectangle; 
+#include "group_rectangles.h"
 
 typedef struct extended_rectangle {
 	Rectangle *rect;
@@ -302,7 +300,7 @@ bool is_interior(Point *p, Rectangle *rect) {
 	return theta > 6.25; 
 }
 
-Rectangle *group_rectangles(Rectangle *rects, int n, double beta, int *size) {
+Rectangle *group_rectangles(Rectangle *rects, int n, float beta, int *size) {
 	int i, j;
 	ExtendedRectangle *extended_rectangles = new ExtendedRectangle [ n ]; /* allocate maximum */
 	Rectangle *result = new Rectangle [ n ]; /* allocate maximum */
@@ -381,6 +379,8 @@ printf("B: summing rectangle: %s\n", print_rectangle(rect->rect));
 	return result;
 }
 
+#if 0
+
 #define NRECTS 4
 Rectangle rectangles[NRECTS] = {
 	{ 0.0, 0.0, 2.0, 2.0 },
@@ -406,3 +406,5 @@ int main(int argc, char **argv) {
 	for(i=0;i<size;++i) printf("%s\n", print_rectangle(&new_rectangles[i]));
 	return 0;
 }
+
+#endif
