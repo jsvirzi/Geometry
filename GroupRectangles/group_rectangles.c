@@ -115,6 +115,10 @@ bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
 // printf("hello a x1a=%.1f x1b=%.1f x2b=%.1f x2a=%.1f\n", x1a, x1b, x2b, x2a);
 // printf("hello a y1b=%.1f y1a=%.1f y2a=%.1f y2b=%.1f\n", y1b, y1a, y2a, y2b);
 
+/* JSV JSV JSV */
+			// if(((y1b <= y1a && y2a <= y2b) && (x1a <  x1b && x2b <  x2a)) 
+			// ||((y1b <  y1a && y2a <  y2b) && (x1a <= x1b && x2b <= x2a))) {
+			// if((y1b <= y1a && y2a <= y2b) && (x1a <= x1b && x2b <= x2a)) {
 			if((y1b < y1a && y2a < y2b) && (x1a < x1b && x2b < x2a)) {
 				p->x = x1b;
 				p->y = y1a;
@@ -132,6 +136,10 @@ bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
 // printf("hello b x1b=%.1f x1a=%.1f x2a=%.1f x2b=%.1f\n", x1b, x1a, x2a, x2b);
 // printf("hello b y1a=%.1f y1b=%.1f y2b=%.1f y2a=%.1f\n", y1a, y1b, y2b, y2a);
 
+/* JSV JSV JSV */
+			// if(((y1a <= y1b && y2b <= y2a) && (x1b <  x1a && x2a <  x2b)) 
+			// ||((y1a <  y1b && y2b <  y2a) && (x1b <= x1a && x2a <= x2b))) {
+			// if((y1a <= y1b && y2b <= y2a) && (x1b <= x1a && x2a <= x2b)) {
 			if((y1a < y1b && y2b < y2a) && (x1b < x1a && x2a < x2b)) {
 				p->x = x1a;
 				p->y = y1b;
@@ -257,10 +265,25 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 /* y2 = y1, y4 = y3, x3 = x2, x4 = x1 */
 bool is_interior(Point *p, Rectangle *rect) {
 
-	if(p->x == rect->x1) return 0.0;
-	if(p->x == rect->x2) return 0.0;
-	if(p->y == rect->y1) return 0.0;
-	if(p->y == rect->y2) return 0.0;
+/* JSV JSV JSV */
+/* search for T intersections */
+	printf("searching for T intersections\n");
+	bool fx1 = (p->x == rect->x1);
+	bool fx2 = (p->x == rect->x2);
+	bool fy1 = (p->y == rect->y1);
+	bool fy2 = (p->y == rect->y2);
+
+	if(fx1 && (!fy1 && !fy2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
+	if(fx2 && (!fy1 && !fy2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
+	if(fy1 && (!fx1 && !fx2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
+	if(fy2 && (!fx1 && !fx2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
+
+#if 0
+	if(p->x == rect->x1) return true;
+	if(p->x == rect->x2) return true;
+	if(p->y == rect->y1) return true;
+	if(p->y == rect->y2) return true;
+#endif
 
 	printf("is_interior(P=(%.1f,%.1f), R=(%.1f,%.1f)x(%.1f,%.1f))", p->x, p->y, rect->x1, rect->y1, rect->x2, rect->y2);
 
@@ -293,6 +316,8 @@ bool is_interior(Point *p, Rectangle *rect) {
 	float c4 = (xa * xb + ya * yb);
 
 	float theta = atan2(s1, c1) + atan2(s2, c2) + atan2(s3, c3) + atan2(s4, c4);
+
+	printf(" yields theta = %.3f.", theta);
 
 	if(theta > 6.25) printf(" returns T\n");
 	else printf(" returns F\n");
