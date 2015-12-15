@@ -77,22 +77,22 @@ merge_rectangles(float *alpha, Rectangle *irect, int n, float fraction) {
 }
 #endif
 
-bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
+bool intersect(Line *linea, Line *lineb, Point *p, int *type) {
 	float x1a = linea->x1, x2a = linea->x2, y1a = linea->y1, y2a = linea->y2; 
 	float x1b = lineb->x1, x2b = lineb->x2, y1b = lineb->y1, y2b = lineb->y2; 
 
-	if(intervals) {
+	printf("intersect(line=((%.1f,%.1f),(%.1f,%.1f)) X line=((%.1f,%.1f),(%.1f,%.1f))\n", x1a, y1a, x2a, y2a, x1b, y1b, x2b, y2b);
 
-		float t;
+	float t;
 
-	/* are the lines horizontal or vertical */
-		bool linea_hor = false, linea_ver = false;
-		if(x1a == x2a) { linea_ver = true; }
-		else if(y1a == y2a) { linea_hor = true; }
+/* are the lines horizontal or vertical */
+	bool linea_hor = false, linea_ver = false;
+	if(x1a == x2a) { linea_ver = true; }
+	else if(y1a == y2a) { linea_hor = true; }
 
-		bool lineb_hor = false, lineb_ver = false;
-		if(x1b == x2b) { lineb_ver = true; }
-		else if(y1b == y2b) { lineb_hor = true; }
+	bool lineb_hor = false, lineb_ver = false;
+	if(x1b == x2b) { lineb_ver = true; }
+	else if(y1b == y2b) { lineb_hor = true; }
 
 // printf("hor ver = %s %s %s %s\n", linea_hor ? "true" : "false",  linea_ver ? "true" : "false",  lineb_hor ? "true" : "false",  lineb_ver ? "true" : "false");
 #if 0
@@ -104,13 +104,15 @@ bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
 #endif
 
 	/* if both lines are either horizontal or vertical, processing is straightforward */
-		if(linea_hor && lineb_ver) {
+	if(linea_hor && lineb_ver) {
 
-		/* order the intervals */
-			if(x2a < x1a) { t = x2a; x2a = x1a; x1a = t; }
-			// if(y2a > y1a) { t = y2a; y2a = y1a; y1a = t; }
-			// if(x2b > x1b) { t = x2b; x2b = x1b; x1b = t; }
-			if(y2b < y1b) { t = y2b; y2b = y1b; y1b = t; }
+printf("HV\n");
+
+	/* order the intervals */
+		if(x2a < x1a) { t = x2a; x2a = x1a; x1a = t; }
+		// if(y2a > y1a) { t = y2a; y2a = y1a; y1a = t; }
+		// if(x2b > x1b) { t = x2b; x2b = x1b; x1b = t; }
+		if(y2b < y1b) { t = y2b; y2b = y1b; y1b = t; }
 
 // printf("hello a x1a=%.1f x1b=%.1f x2b=%.1f x2a=%.1f\n", x1a, x1b, x2b, x2a);
 // printf("hello a y1b=%.1f y1a=%.1f y2a=%.1f y2b=%.1f\n", y1b, y1a, y2a, y2b);
@@ -119,19 +121,40 @@ bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
 			// if(((y1b <= y1a && y2a <= y2b) && (x1a <  x1b && x2b <  x2a)) 
 			// ||((y1b <  y1a && y2a <  y2b) && (x1a <= x1b && x2b <= x2a))) {
 			// if((y1b <= y1a && y2a <= y2b) && (x1a <= x1b && x2b <= x2a)) {
-			if((y1b < y1a && y2a < y2b) && (x1a < x1b && x2b < x2a)) {
-				p->x = x1b;
-				p->y = y1a;
-				return true;
-			}
+		if((y1b < y1a && y2a < y2b) && (x1a < x1b && x2b < x2a)) {
+printf("am a +\n");
+			p->x = x1b;
+			p->y = y1a;
+			*type = 0;
+			return true;
+		}
 
-		} else if(lineb_hor && linea_ver) {
+#if 1
+		if(((y1a == y1b) || (y2a == y2b)) && (x1a < x1b && x2b < x2a)) {
+printf("am a T\n");
+			p->x = x1b;
+			p->y = y1a;
+			*type = 1;
+			return true;
+		}
 
-		/* order the intervals */
-			// if(x2a > x1a) { t = x2a; x2a = x1a; x1a = t; }
-			if(y2a < y1a) { t = y2a; y2a = y1a; y1a = t; }
-			if(x2b < x1b) { t = x2b; x2b = x1b; x1b = t; }
-			// if(y2b > y1b) { t = y2b; y2b = y1b; y1b = t; }
+		if(((x1a == x1b) || (x2a == x2b)) && (y1b < y1a && y2a < y2b)) {
+printf("am a T\n");
+			p->x = x1b;
+			p->y = y1a;
+			*type = 1;
+			return true;
+		}
+
+#endif
+
+	} else if(lineb_hor && linea_ver) {
+
+	/* order the intervals */
+		// if(x2a > x1a) { t = x2a; x2a = x1a; x1a = t; }
+		if(y2a < y1a) { t = y2a; y2a = y1a; y1a = t; }
+		if(x2b < x1b) { t = x2b; x2b = x1b; x1b = t; }
+		// if(y2b > y1b) { t = y2b; y2b = y1b; y1b = t; }
 
 // printf("hello b x1b=%.1f x1a=%.1f x2a=%.1f x2b=%.1f\n", x1b, x1a, x2a, x2b);
 // printf("hello b y1a=%.1f y1b=%.1f y2b=%.1f y2a=%.1f\n", y1a, y1b, y2b, y2a);
@@ -140,13 +163,33 @@ bool intersect(Line *linea, Line *lineb, Point *p, bool intervals = true) {
 			// if(((y1a <= y1b && y2b <= y2a) && (x1b <  x1a && x2a <  x2b)) 
 			// ||((y1a <  y1b && y2b <  y2a) && (x1b <= x1a && x2a <= x2b))) {
 			// if((y1a <= y1b && y2b <= y2a) && (x1b <= x1a && x2a <= x2b)) {
-			if((y1a < y1b && y2b < y2a) && (x1b < x1a && x2a < x2b)) {
-				p->x = x1a;
-				p->y = y1b;
-				return true;
-			}
+		if((y1a < y1b && y2b < y2a) && (x1b < x1a && x2a < x2b)) {
+printf("am a +\n");
+			p->x = x1a;
+			p->y = y1b;
+			*type = 0;
+			return true;
 		}
-	} else {
+
+#if 1
+		if(((x1b == x1a) || (x2b == x2a)) && (y1a < y1b && y2b < y2a)) {
+printf("am a T\n");
+			p->x = x1a;
+			p->y = y1b;
+			*type = 1;
+			return true;
+		}
+
+		if(((y1b == y1a) || (y2b == y2a)) && (x1b < x1a && x2a < x2b)) {
+printf("am a T\n");
+			p->x = x1a;
+			p->y = y1b;
+			*type = 1;
+			return true;
+		}
+
+#endif
+
 	}
 	return false;
 }
@@ -183,40 +226,86 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 	Line line2d = { rectb->x1, rectb->y2, rectb->x2, rectb->y2 }; /* horizontal */
 
 	Point p;
-	Point points[12];
+	Point xpoints[12];
+	Point tpoints[12];
 
-	points[0] = { recta->x1, recta->y1 };
-	points[1] = { recta->x1, recta->y2 };
-	points[2] = { recta->x2, recta->y1 };
-	points[3] = { recta->x2, recta->y2 };
+	xpoints[0] = { recta->x1, recta->y1 };
+	xpoints[1] = { recta->x1, recta->y2 };
+	xpoints[2] = { recta->x2, recta->y1 };
+	xpoints[3] = { recta->x2, recta->y2 };
 
-	points[4] = { rectb->x1, rectb->y1 };
-	points[5] = { rectb->x1, rectb->y2 };
-	points[6] = { rectb->x2, rectb->y1 };
-	points[7] = { rectb->x2, rectb->y2 };
+	xpoints[4] = { rectb->x1, rectb->y1 };
+	xpoints[5] = { rectb->x1, rectb->y2 };
+	xpoints[6] = { rectb->x2, rectb->y1 };
+	xpoints[7] = { rectb->x2, rectb->y2 };
 
-	int index = 8;
+	int xindex = 8, tindex = 0, type;
 
-	if(intersect(&line1a, &line2c, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1a, &line2d, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1b, &line2c, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1b, &line2d, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1c, &line2a, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1c, &line2b, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1d, &line2a, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
-	if(intersect(&line1d, &line2b, &p)) { printf("intersection = (%.1f, %.1f)\n", p.x, p.y); points[index++] = p; };
+	if(intersect(&line1a, &line2c, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1a, &line2d, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1b, &line2c, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1b, &line2d, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1c, &line2a, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1c, &line2b, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1d, &line2a, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
+	if(intersect(&line1d, &line2b, &p, &type)) { 
+		printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type);
+		if(type == 0) xpoints[xindex++] = p;
+		else if(type == 1) tpoints[tindex++] = p;
+	};
 
-	printf("%d points\n", index);
+#if 0
+	if(intersect(&line1a, &line2c, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1a, &line2d, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1b, &line2c, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1b, &line2d, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1c, &line2a, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1c, &line2b, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1d, &line2a, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+	if(intersect(&line1d, &line2b, &p, &type)) { printf("intersection = (%.1f, %.1f) is type %d\n", p.x, p.y, type); points[index++] = p; };
+#endif
+
+	printf("%d x-points. %d t-points\n", xindex, tindex);
 
 	int n = 0;
 	Point pts[12];
 
 	printf("uber rectangle = %s\n", print_rectangle(&uber_rectangle));
-	for(int i=0;i<index;++i) {
-		bool flag = is_interior(&points[i], &uber_rectangle); 
-		// printf("point=(%.1f,%.1f) is %s\n", points[i].x, points[i].y, flag ? "inside" : "outside");
-		if(flag) pts[n++] = points[i];
+	for(int i=0;i<xindex;++i) {
+		bool flag = is_interior(&xpoints[i], &uber_rectangle); 
+		// printf("point=(%.1f,%.1f) is %s\n", xpoints[i].x, xpoints[i].y, flag ? "inside" : "outside");
+		if(flag) pts[n++] = xpoints[i];
 	}
+
+	for(int i=0;i<tindex;++i) { pts[n++] = tpoints[i]; }
 
 	if(n == 4) {
 		// printf("final area = %f\n", area(pts, n));
@@ -273,10 +362,14 @@ bool is_interior(Point *p, Rectangle *rect) {
 	bool fy1 = (p->y == rect->y1);
 	bool fy2 = (p->y == rect->y2);
 
+	if(fx1 || fx2 || fy1 || fy2) return false;
+
+#if 0
 	if(fx1 && (!fy1 && !fy2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
 	if(fx2 && (!fy1 && !fy2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
 	if(fy1 && (!fx1 && !fx2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
 	if(fy2 && (!fx1 && !fx2)) { printf("P=(%.1f,%.1f) is T\n", p->x, p->y); return true; }
+#endif
 
 #if 0
 	if(p->x == rect->x1) return true;
