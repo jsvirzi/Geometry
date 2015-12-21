@@ -8,6 +8,17 @@ using namespace cv;
 using namespace std;
 
 Rectangle rectangles[] = {
+
+	{ 1.0, 1.0, 4.0, 4.0 },
+	{ 1.5, 1.5, 4.5, 4.5 },
+	{ 2.0, 2.0, 5.0, 5.0 },
+
+	// { 21.0, 21.0, 24.0, 24.0 },
+	// { 21.5, 21.5, 24.5, 24.5 },
+	// { 22.0, 22.0, 25.0, 25.0 },
+
+	{ -1.0,  0.0,  0.0,  0.0 },
+
 	// {  0.0,  0.0,  2.0,  2.0 },
 	// {  1.0,  1.0,  3.0,  3.0 },
 	// {  4.0,  4.0,  5.0,  5.0 },
@@ -58,13 +69,19 @@ Rectangle rectangles[] = {
 
 float xscale = 0.0, yscale = 0.0;
 
+#define MAX_RECTANGLES 1000
+Rectangle new_rectangles [ MAX_RECTANGLES ];
+
 int main(int argc, char **argv) {
 	int i, size, nrects = 0;
 	for(nrects=0;rectangles[nrects].x1>=0;) ++nrects; /* count the rectangles */
 	for(i=0;i<nrects;++i) if(rectangles[i].y2 > yscale) yscale = rectangles[i].y2;
 	for(i=0;i<nrects;++i) if(rectangles[i].x2 > xscale) xscale = rectangles[i].x2;
 	printf("found %d rectangles as input. scales = %.1f, %.1f\n", nrects, xscale, yscale);
-	Rectangle *new_rectangles = group_rectangles(rectangles, nrects, 0.1, &size);
+	xscale = 1.1 * xscale;
+	yscale = 1.1 * yscale;
+	size = MAX_RECTANGLES;
+	group_rectangles(rectangles, nrects, 0.1, &size, new_rectangles);
 	printf("%d old rectangles\n", nrects);
 	for(i=0;i<nrects;++i) printf("%s\n", print_rectangle(&rectangles[i]));
 	printf("%d new rectangles\n", size);
@@ -98,8 +115,6 @@ int main(int argc, char **argv) {
 	namedWindow("main", 1);
 	imshow("main", frame);
 	int ch = waitKey(0);
-
-	delete [] new_rectangles;
 
 	// C++: void rectangle(Mat& img, Rect rec, const Scalar& color, int thickness=1, int lineType=8, int shift=0);
 
