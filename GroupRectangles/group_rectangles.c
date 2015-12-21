@@ -334,10 +334,10 @@ bool is_interior(Point *p, Rectangle *rect) {
 	return theta > 6.25; 
 }
 
-Rectangle *group_rectangles(Rectangle *rects, int n, float beta, int *size) {
+Rectangle *group_rectangles(Rectangle *rects, int n, float beta, int *size, Rectangle *result) {
 	int i, j;
 	ExtendedRectangle *extended_rectangles = new ExtendedRectangle [ n ]; /* allocate maximum */
-	Rectangle *result = new Rectangle [ n ]; /* allocate maximum */
+	if(result == 0) result = new Rectangle [ n ]; /* allocate maximum */
 	for(i=0;i<n;++i) {
 		Rectangle *rect = &rects[i];
 		extended_rectangles[i].rect = rect;
