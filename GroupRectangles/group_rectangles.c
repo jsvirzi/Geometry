@@ -349,34 +349,37 @@ Rectangle *group_rectangles(Rectangle *rects, int n, float beta, int *size, Rect
 	}
 
 	for(i=0;i<n;++i) {
-		ExtendedRectangle *recti = &extended_rectangles[i];
-		float a1 = recti->area;
-		float t1 = recti->intersection_threshold; /* first threshold for intersection */
+		ExtendedRectangle *C = &extended_rectangles[i];
+		float a1 = C->area;
+		float t1 = C->intersection_threshold; /* first threshold for intersection */
 #ifdef DEBUG
 printf("rectangle %d = %s\n", i, print_rectangle(recti->rect)); 
 #endif
 		for(j=i+1;j<n;++j) {
-			ExtendedRectangle *rectj = &extended_rectangles[j];
-			float t2 = rectj->intersection_threshold; /* 2nd threshold for intersection */
-			float a = intersection(recti->rect, rectj->rect);
+			ExtendedRectangle *D = &extended_rectangles[j];
+
+			if(D->prev != D || D->next != D) continue; /* already processed */
+
+			float t2 = D->intersection_threshold; /* 2nd threshold for intersection */
+			float a = intersection(C->rect, D->rect);
 			if((a > t1) || (a > t2)) {
+#ifdef DEBUG
+printf("rectangle %d merges with %d\n", i, j);
+#endif
+				ExtendedRectangle *A = C->next;
+				ExtendedRectangle *F = D->prev;
 
-				ExtendedRectangle *previ = recti->prev;
-				ExtendedRectangle *prevj = rectj->prev;
-				ExtendedRectangle *nexti = recti->next;
-				ExtendedRectangle *nextj = rectj->next;
-
-				rectj->prev->prev = nexti; // A
-				recti->prev = rectj; // B
-				rectj->next = recti; // C
-				recti->next->next = prevj; // D
-
+				C->next = D;
+				D->prev = C;
+				A->prev = F;
+				F->next = A;
+				
 			}
 		}
 	}
 
 	int index = 0;
-	for(i=1;i<n;++i) {
+	for(i=0;i<n;++i) {
 		ExtendedRectangle *rect0 = &extended_rectangles[i], *rect = rect0;
 		if(rect->id == 0) continue; /* already been processed */
 		rect->id = 0;
@@ -385,11 +388,15 @@ printf("rectangle %d = %s\n", i, print_rectangle(recti->rect));
 		float xmax = a * rect->rect->x2;
 		float ymin = a * rect->rect->y1;
 		float ymax = a * rect->rect->y2;
-// printf("A: summing rectangle: %s\n", print_rectangle(rect->rect));
+#ifdef DEBUG
+printf("A: summing rectangle: %s\n", print_rectangle(rect->rect));
+#endif
 		while(rect->next != rect0) {
 			rect = rect->next;
 			rect->id = 0;
-// printf("B: summing rectangle: %s\n", print_rectangle(rect->rect));
+#ifdef DEBUG
+printf("B: summing rectangle: %s\n", print_rectangle(rect->rect));
+#endif
 			a = rect->area;
 			xmin += a * rect->rect->x1;
 			xmax += a * rect->rect->x2;
