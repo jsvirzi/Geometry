@@ -281,6 +281,46 @@ float intersection(Rectangle *recta, Rectangle *rectb) {
 	return result;
 }
 
+/*
+ * this following algorithm works for our purposes, because we are working with the simplest type of rectangle.
+ * namely, our rectangles have vertical and horizontal edges. this just checks that our coordinates are within
+ * the rectangular bounds
+ */
+bool is_interior(Point *p, Rectangle *rect) {
+
+/* search for T intersections */
+#ifdef DEBUG
+	printf("is_interior(P=(%.1f,%.1f), R=(%.1f,%.1f)x(%.1f,%.1f))", p->x, p->y, rect->x1, rect->y1, rect->x2, rect->y2);
+#endif
+
+	bool x_ok = (rect->x1 < p->x) && (p->x < rect->x2);
+	bool y_ok = (rect->y1 < p->y) && (p->y < rect->y2);
+
+	return x_ok && y_ok;
+}
+
+#ifdef ALGORITHMB
+
+/*
+ * this algorithm checks for an odd/even number of polygon edge crossings
+ */
+bool is_interior(Point *p, Rectangle *rect) {
+
+/* search for T intersections */
+#ifdef DEBUG
+	printf("is_interior(P=(%.1f,%.1f), R=(%.1f,%.1f)x(%.1f,%.1f))", p->x, p->y, rect->x1, rect->y1, rect->x2, rect->y2);
+#endif
+
+	return false; /* dummied out */
+
+#endif
+
+#ifdef ALGORITHMA
+/*
+ * this is an inefficient method to calculate if a point is in the interior of a polygon
+ * primarily due to the arctangent function called. there are different algorithms
+ * that can be exploited and make this more efficient, including using a lookup table
+ */
 bool is_interior(Point *p, Rectangle *rect) {
 
 /* search for T intersections */
@@ -333,6 +373,7 @@ bool is_interior(Point *p, Rectangle *rect) {
 
 	return theta > 6.25; 
 }
+#endif
 
 Rectangle *group_rectangles(Rectangle *rects, int n, float beta, int *size, Rectangle *result) {
 	int i, j;
