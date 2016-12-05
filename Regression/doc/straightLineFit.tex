@@ -3,7 +3,9 @@
 \usepackage{amsmath}
 
 \newcommand{\meanx}{\ensuremath{\mu_{x}}}
+\newcommand{\meanxsquared}{\ensuremath{\mu_{x}^{2}}}
 \newcommand{\meany}{\ensuremath{\mu_{y}}}
+\newcommand{\meanysquared}{\ensuremath{\mu_{y}^{2}}}
 \newcommand{\meanxx}{\ensuremath{\mu_{xx}}}
 \newcommand{\meanxy}{\ensuremath{\mu_{xy}}}
 \newcommand{\meanyy}{\ensuremath{\mu_{yy}}}
@@ -70,14 +72,85 @@ $b$
 \right)
 \end{equation}
 
+which can be reexpressed as
+
 \begin{equation}
 \left(
+\begin{tabular}{c}
+$\meanxy$ \\
+$\meany$
+\end{tabular}
+\right) = 
+\left(
 \begin{tabular}{cc}
-$ \cos \theta$ & $\sin \theta$ \\
- - $\sin \theta$ & $\cos \theta$ \\
+$ \meanxx $ & $ \meanx $ \\
+$ \meanx $ & 1 \\
+\end{tabular}
+\right)
+\left(
+\begin{tabular}{c}
+$m$ \\
+$b$
 \end{tabular}
 \right)
 \end{equation}
+
+where the following definitions make the equations easier to work with
+
+\begin{equation}
+\meanx = \dfrac{1}{N} \Sigma_{i=1}^{N} x_{i}
+\end{equation}
+
+\begin{equation}
+\meany = \dfrac{1}{N} \Sigma_{i=1}^{N} x_{y}
+\end{equation}
+
+\begin{equation}
+\meanxx = \dfrac{1}{N} \Sigma_{i=1}^{N} x_{i}^{2}
+\end{equation}
+
+\begin{equation}
+\meanxy = \dfrac{1}{N} \Sigma_{i=1}^{N} x_{i} y_{i}
+\end{equation}
+
+\begin{equation}
+\meanyy = \frac{1}{N} \Sigma_{i=1}^{N} y_{i}^{2}
+\end{equation}
+
+and that leads to the following solution for $ \left( m, b \right)$
+
+\begin{equation}
+m = \frac{\sxy}{\sxx}
+\end{equation}
+
+\begin{equation}
+b = \meany - m \meanx = \frac{\meany \meanxx - \meanx \meanxy}{\mu_{xx} - \mu_{x}^{2}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+The treatment of regression in the previous section assumes that $x_{i}$ are perfectly known, 
+and that $y_{i}$ have equal errors associated with them.
+In this section, we extend this treatment to the case where $x_{i}$ and $y_{i}$ have equal measurement errors.
+Instead of drawing a ``vertical drop'' from each $y_{i}$,
+it is more appropriate to consider a ``normal drop'' from each point $ \left( x_{i}, y_{i} \right) $ to the line.
+The form of the cost function $S$ in EQUATION1 above is readily differentiated to solve standard linear regression.
+Taking the same approach (modifying $S$) to account for the orthogonal distance between a point and a line
+ is an efficient starting point to solve this problem.
+Instead, consider rotating each point to a reference frame where linear regression gives a slope $ m^{\prime} = 0 $.
+In this frame, the vertical distance is also the orthogonal distance.
+To obtain the desired result in our original frame, we rotate the horizontal line.
+
+Start by rotating each point by an angle $ \theta $
+
+% \begin{equation}
+% \left(
+% \begin{tabular}{cc}
+% $ \cos \theta$ & $\sin \theta$ \\
+%  - $\sin \theta$ & $\cos \theta$ \\
+% \end{tabular}
+% \right)
+% \end{equation}
 
 \begin{equation}
 \left(
@@ -100,48 +173,28 @@ $y_{i}$
 \right)
 \end{equation}
 
+The cost function $S^{\prime}$ in this frame is readily expressed
+
 \begin{equation}
-m = \frac{\sxy}{\sxx}
+S^{\prime} \equiv \Sigma_{i=1}^{N} \left( \left( y_{i} \cos \theta - x_{i} \sin \theta \right) - m \left( x_{i} \cos \theta + y_{i} \sin \theta \right) - b \right)^{2}
+\end{equation}
+
+
+
+\begin{equation}
+\sxx \equiv \meanxx - {\meanxsquared}
 \end{equation}
 
 \begin{equation}
-b = \meany - m \meanx = \frac{\meany \meanxx - \meanx \meanxy}{\mu_{xx} - \mu_{x}^{2}}
+\sxy \equiv \meanxy - \meanx \meany
 \end{equation}
 
 \begin{equation}
-\meanx = \Sigma_{i=1}^{N} x_{i}
+\syy \equiv \meanyy - \meanysquared
 \end{equation}
 
 \begin{equation}
-\mu_{Y} = \Sigma_{i=1}^{N} x_{y}
-\end{equation}
-
-\begin{equation}
-\mu_{XX} = \Sigma_{i=1}^{N} x_{i}^{2}
-\end{equation}
-
-\begin{equation}
-\mu_{XY} = \Sigma_{i=1}^{N} x_{i} y_{i}
-\end{equation}
-
-\begin{equation}
-\mu_{YY} = \Sigma_{i=1}^{N} y_{i}^{2}
-\end{equation}
-
-\begin{equation}
-\sxx \equiv \mu_{XX} - \mu_{X}^{2}
-\end{equation}
-
-\begin{equation}
-\sxy \equiv \mu_{XY} - \mu_{X} \mu_{Y}
-\end{equation}
-
-\begin{equation}
-\syy \equiv \mu_{YY} - \mu_{Y}^{2}
-\end{equation}
-
-\begin{equation}
-\tan \left( 2 \theta \right) = \frac{2 \sigma_{XY}}{\sigma_{XX} - \sigma_{YY}}
+\tan \left( 2 \theta \right) = \frac{2 \sxy}{\sxx - \syy}
 \end{equation}
 
 \section{Literature Review}
