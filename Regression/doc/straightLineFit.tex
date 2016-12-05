@@ -1,0 +1,155 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\newcommand{\meanx}{\ensuremath{\mu_{x}}}
+\newcommand{\meany}{\ensuremath{\mu_{y}}}
+\newcommand{\meanxx}{\ensuremath{\mu_{xx}}}
+\newcommand{\meanxy}{\ensuremath{\mu_{xy}}}
+\newcommand{\meanyy}{\ensuremath{\mu_{yy}}}
+\newcommand{\sxx}{\ensuremath{\sigma_{xx}}}
+\newcommand{\sxy}{\ensuremath{\sigma_{xy}}}
+\newcommand{\syy}{\ensuremath{\sigma_{yy}}}
+
+\title{Hello, Cruel World!}
+\author{Obedient Grad Student}
+
+\begin{document}
+\maketitle
+
+\section{Standard Linear Regression}
+
+The cost function $S$
+
+\begin{equation}
+S \equiv \Sigma_{i=1}^{N} \left( y_{i} - m x_{i} - b \right)^{2}
+\end{equation}
+
+is minimized with respect to the parameters of the line, name $m$ and $b$.
+
+\begin{equation}
+-\frac{1}{2}\frac{\partial S}{\partial m} = \Sigma_{i=1}^{N} \left( y_{i} - m x_{i} - b \right) x_{i}
+\end{equation}
+
+\begin{equation}
+-\frac{1}{2}\frac{\partial S}{\partial b} = \Sigma_{i=1}^{N} \left( y_{i} - m x_{i} - b \right)
+\end{equation}
+
+\begin{equation}
+\frac{\partial S}{\partial m} = \frac{\partial S}{\partial b} = 0
+\end{equation}
+
+% \[
+% M=
+%   \begin{bmatrix}
+%     1 & 2 & 3 & 4 & 5 \\
+%     3 & 4 & 5 & 6 & 7
+%   \end{bmatrix}
+% \]
+
+leads to the following system of equations
+
+\begin{equation}
+\left(
+\begin{tabular}{c}
+$\Sigma x_{i} y_{i}$ \\
+$\Sigma y_{i}$
+\end{tabular}
+\right) = 
+\left(
+\begin{tabular}{cc}
+$ \Sigma x_{i}^{2} $ & $\Sigma x_{i} $ \\
+$ \Sigma x_{i} $ & $N$ \\
+\end{tabular}
+\right)
+\left(
+\begin{tabular}{c}
+$m$ \\
+$b$
+\end{tabular}
+\right)
+\end{equation}
+
+\begin{equation}
+\left(
+\begin{tabular}{cc}
+$ \cos \theta$ & $\sin \theta$ \\
+ - $\sin \theta$ & $\cos \theta$ \\
+\end{tabular}
+\right)
+\end{equation}
+
+\begin{equation}
+\left(
+\begin{tabular}{c}
+$x_{i}^{\prime}$ \\
+$y_{i}^{\prime}$
+\end{tabular}
+\right) = 
+\left(
+\begin{tabular}{cc}
+$ \cos \theta$ & $\sin \theta$ \\
+ - $\sin \theta$ & $\cos \theta$ \\
+\end{tabular}
+\right)
+\left(
+\begin{tabular}{c}
+$x_{i}$ \\
+$y_{i}$
+\end{tabular}
+\right)
+\end{equation}
+
+\begin{equation}
+m = \frac{\sxy}{\sxx}
+\end{equation}
+
+\begin{equation}
+b = \meany - m \meanx = \frac{\meany \meanxx - \meanx \meanxy}{\mu_{xx} - \mu_{x}^{2}}
+\end{equation}
+
+\begin{equation}
+\meanx = \Sigma_{i=1}^{N} x_{i}
+\end{equation}
+
+\begin{equation}
+\mu_{Y} = \Sigma_{i=1}^{N} x_{y}
+\end{equation}
+
+\begin{equation}
+\mu_{XX} = \Sigma_{i=1}^{N} x_{i}^{2}
+\end{equation}
+
+\begin{equation}
+\mu_{XY} = \Sigma_{i=1}^{N} x_{i} y_{i}
+\end{equation}
+
+\begin{equation}
+\mu_{YY} = \Sigma_{i=1}^{N} y_{i}^{2}
+\end{equation}
+
+\begin{equation}
+\sxx \equiv \mu_{XX} - \mu_{X}^{2}
+\end{equation}
+
+\begin{equation}
+\sxy \equiv \mu_{XY} - \mu_{X} \mu_{Y}
+\end{equation}
+
+\begin{equation}
+\syy \equiv \mu_{YY} - \mu_{Y}^{2}
+\end{equation}
+
+\begin{equation}
+\tan \left( 2 \theta \right) = \frac{2 \sigma_{XY}}{\sigma_{XX} - \sigma_{YY}}
+\end{equation}
+
+\section{Literature Review}
+This is the section that is invariably much longer than it should be, and
+where everyone tries to impress peers about how easy it is to locate various
+references in online databases.
+
+\section{Conclusion}
+Not much of a paper, but it's a start.
+
+\end{document}
