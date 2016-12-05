@@ -1,0 +1,1 @@
+g++ -std=c++11 regression.cpp -DTEST=1 -o test_regression
