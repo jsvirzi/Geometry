@@ -13,8 +13,8 @@
 \newcommand{\sxy}{\ensuremath{\sigma_{xy}}}
 \newcommand{\syy}{\ensuremath{\sigma_{yy}}}
 
-\title{Hello, Cruel World!}
-\author{Obedient Grad Student}
+\title{Simple Linear and Orthogonal Regression}
+\author{J.S. Virzi}
 
 \begin{document}
 \maketitle
@@ -194,15 +194,31 @@ S^{\prime} \equiv \Sigma_{i=1}^{N} \left( \left( y_{i} \cos \theta - x_{i} \sin 
 \end{equation}
 
 \begin{equation}
-\tan \left( 2 \theta \right) = \frac{2 \sxy}{\sxx - \syy}
+\alpha \equiv \tan \left( 2 \theta \right) = \frac{2 \sxy}{\sxx - \syy}
 \end{equation}
 
-\section{Literature Review}
-This is the section that is invariably much longer than it should be, and
-where everyone tries to impress peers about how easy it is to locate various
-references in online databases.
+Using the half-angle formulae to express this
 
-\section{Conclusion}
-Not much of a paper, but it's a start.
+\begin{equation}
+\tan \left( 2 \theta \right) = \frac{2 \tan \theta}{1 - \tan^{2} \theta}
+\end{equation}
+
+and since the slope $m = \tan \theta $, we arrive at the following formula for the slope of the line
+
+\begin{equation}
+m = \frac{1}{\alpha} \left( \sqrt{\alpha^{2} + 1} - 1\right)
+\end{equation}
+
+The extraneous solution is
+
+\begin{equation}
+m = - \frac{1}{\alpha} \left( \sqrt{\alpha^{2} + 1} + 1\right)
+\end{equation}
+
+Or simply
+
+\begin{equation}
+m = \frac{1}{2} \arctan \left( \frac{2 \sxy}{\sxx - \syy} \right)
+\end{equation}
 
 \end{document}
