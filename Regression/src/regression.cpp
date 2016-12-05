@@ -43,8 +43,9 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 	if(option == 0) {
 		m = sxy / sxx;
 	} else {
-		float syy = muyy - mux * muy;
-		m = tan(0.5 * atan2(sxy, sxx - syy));
+		float syy = muyy - muy * muy;
+		float txy = syy - sxx;
+		m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
 	}
 	b = muy - m * mux; 
 
