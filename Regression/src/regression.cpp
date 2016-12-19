@@ -45,7 +45,8 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 	} else {
 		float syy = muyy - muy * muy;
 		float txy = syy - sxx;
-		m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
+		// m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
+		m = 0.5 * atan2(2.0 * sxy, txy);
 	}
 	b = muy - m * mux; 
 
@@ -61,7 +62,7 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 
 #ifdef TEST
 
-#define N 10
+#define N 11
 float x[N], y[N];
 
 int main(int argc, char **argv) {
@@ -101,6 +102,31 @@ int main(int argc, char **argv) {
 	S = regression(x, y, N, &m, &b, 1);
 	T = cost(x, y, N, mTrue, bTrue, 1);
 	printf("normal regression gives y = %.3f x + %.3f. S = %f. T = %f\n", m, b, S, T);
+
+	/* known test vector */
+	mTrue = 1.0;
+	bTrue = 1.0;
+
+	m = 1.0;
+	b = 0.0;
+	for(int i=0;i<N;i+=2) {
+		x[i] = i;
+		y[i] = m * x[i] + b;
+	}
+
+	b = 2.0;
+	for(int i=1;i<N;i+=2) {
+		x[i] = i;
+		y[i] = m * x[i] + b;
+	}
+
+	for(int i=1;i<N;++i) {
+		printf("test vector input %d = (%f, %f)\n", i, x[i], y[i]);
+	}
+
+	S = regression(x, y, N, &m, &b, 0);
+	T = cost(x, y, N, mTrue, bTrue, 0);
+	printf("test vector: regression gives y = %.3f x + %.3f. S = %f. T = %f\n", m, b, S, T);
 
 	return 0;
 }
