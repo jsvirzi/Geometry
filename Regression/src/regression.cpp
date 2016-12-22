@@ -8,13 +8,24 @@
 #include <stdio.h>
 #include <math.h>
 
+enum {
+	LINEAR_REGRESSION = 0,
+	NORMAL_REGRESSION = 1
+};
+
 float cost(float *x, float *y, int n, float m, float b, int option) {
 	float S = 0.0f;
-	for(int i=0;i<n;++i) {
-		S += fabs(m * x[i] - y[i] + b);
-	}
-	if(option == 1) {
-		S = S / sqrt(1.0f + m * m);
+	
+	if(option == LINEAR_REGRESSION) { /* normal */
+		for(int i=0;i<n;++i) {
+			float dS = y[i] - m * x[i] - b; 
+			S += dS * dS; 
+		}
+	} else if(option == NORMAL_REGRESSION) { /* linear */
+		for(int i=0;i<n;++i) {
+			S += fabs(y[i] - m * x[i] - b);
+		}
+		S = sqrt(S / (1.0f + m * m));
 	}
 	return S;
 }
@@ -39,23 +50,23 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 	muyy /= n;
 	float sxx = muxx - mux * mux;
 	float sxy = muxy - mux * muy;
+	float syy = muyy - muy * muy;
 	float m, b;
-	if(option == 0) {
+	if(option == LINEAR_REGRESSION) {
 		m = sxy / sxx;
-	} else {
-		float syy = muyy - muy * muy;
-		float txy = syy - sxx;
+	} else if(option = NORMAL_REGRESSION) {
+		float txy = sxx - syy;
 		// m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
-		m = 0.5 * atan2(2.0 * sxy, txy);
+		m = 0.5 * atan2(2.0 * sxy, sxx - syy);
 	}
 	b = muy - m * mux; 
 
 	*slope = m;
 	*intercept = b;
 
-	return -1.0f; /* TODO return the regression measure */
+	// return -1.0f; /* TODO return the regression measure */
 	/* uncomment the following line instead to return the cost function */
-	/* return cost(x, y, n, m, b, option); */
+	return cost(x, y, n, m, b, option);
 }
 
 /* and here */
@@ -120,12 +131,12 @@ int main(int argc, char **argv) {
 		y[i] = m * x[i] + b;
 	}
 
-	for(int i=1;i<N;++i) {
+	for(int i=0;i<N;++i) {
 		printf("test vector input %d = (%f, %f)\n", i, x[i], y[i]);
 	}
 
-	S = regression(x, y, N, &m, &b, 0);
-	T = cost(x, y, N, mTrue, bTrue, 0);
+	S = regression(x, y, N, &m, &b, 1);
+	T = cost(x, y, N, mTrue, bTrue, 1);
 	printf("test vector: regression gives y = %.3f x + %.3f. S = %f. T = %f\n", m, b, S, T);
 
 	return 0;
