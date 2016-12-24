@@ -54,10 +54,11 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 	float m, b;
 	if(option == LINEAR_REGRESSION) {
 		m = sxy / sxx;
-	} else if(option = NORMAL_REGRESSION) {
-		float txy = sxx - syy;
+	} else if(option == NORMAL_REGRESSION) {
+		float txy = - sxx + syy;
 		// m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
-		m = 0.5 * atan2(2.0 * sxy, sxx - syy);
+		m = tan(0.5 * atan2(2.0 * sxy, sxx - syy));
+		// m = 0.5 * atan2(sxx - syy, 2.0 * sxy);
 	}
 	b = muy - m * mux; 
 
@@ -73,7 +74,7 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 
 #ifdef TEST
 
-#define N 11
+#define N 51
 float x[N], y[N];
 
 int main(int argc, char **argv) {
