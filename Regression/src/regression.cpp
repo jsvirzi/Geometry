@@ -56,25 +56,26 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 		m = sxy / sxx;
 	} else if(option == NORMAL_REGRESSION) {
 		float txy = - sxx + syy;
-		// m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
-		m = tan(0.5 * atan2(2.0 * sxy, sxx - syy));
-		// m = 0.5 * atan2(sxx - syy, 2.0 * sxy);
+		/* this form should be more efficient because you calculate only a square root */
+		m = (txy + sqrt(txy * txy + 4.0f * sxy * sxy)) / (2.0f * sxy); 
+		/* this next form is more elegant, but need to calculate both tangent and arctangent */
+		// m = tan(0.5 * atan2(2.0 * sxy, sxx - syy));
 	}
 	b = muy - m * mux; 
 
 	*slope = m;
 	*intercept = b;
 
-	// return -1.0f; /* TODO return the regression measure */
+	return -1.0f; /* TODO return the regression measure */
 	/* uncomment the following line instead to return the cost function */
-	return cost(x, y, n, m, b, option);
+	// return cost(x, y, n, m, b, option);
 }
 
 /* and here */
 
 #ifdef TEST
 
-#define N 51
+#define N 10
 float x[N], y[N];
 
 int main(int argc, char **argv) {
@@ -138,7 +139,7 @@ int main(int argc, char **argv) {
 
 	S = regression(x, y, N, &m, &b, 1);
 	T = cost(x, y, N, mTrue, bTrue, 1);
-	printf("test vector: regression gives y = %.3f x + %.3f. S = %f. T = %f\n", m, b, S, T);
+	printf("test vector: regression gives y = %.5f x + %.5f. S = %f. T = %f\n", m, b, S, T);
 
 	return 0;
 }
