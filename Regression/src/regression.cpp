@@ -52,9 +52,9 @@ float regression(float *x, float *y, int n, float *slope, float *intercept, int 
 	*slope = m;
 	*intercept = b;
 
-	return -1.0f; /* TODO return the regression measure */
+	/* return -1.0f; TODO return the regression measure */
 	/* uncomment the following line instead to return the cost function */
-	/* return cost(x, y, n, m, b, option); */
+	return cost(x, y, n, m, b, option); 
 }
 
 /* and here */
