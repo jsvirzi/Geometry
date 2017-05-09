@@ -25,7 +25,7 @@ float cost(float *x, float *y, int n, float m, float b, int option) {
 		for(int i=0;i<n;++i) {
 			S += fabs(y[i] - m * x[i] - b);
 		}
-		S = sqrt(S / (1.0f + m * m));
+		S = S / sqrt(1.0f + m * m);
 	}
 	return S;
 }
